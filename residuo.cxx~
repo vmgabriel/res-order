@@ -1,0 +1,86 @@
+/*
+ * residuo.cxx
+ * 
+ * Copyright 2016 Gabriel Vargas <gabreta@VmGabriel96>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ * 
+ * 
+ */
+
+
+#include <iostream>
+#include <time.h>
+#include <sys/time.h>
+
+using namespace std;
+
+double timeval_diff(struct timeval *a, struct timeval *b)
+{
+    return
+	(double)(a->tv_sec + (double)a->tv_usec/1000000) -
+	(double)(b->tv_sec + (double)b->tv_usec/1000000);
+}
+
+void intercambio (int * a, int posa,int posb)
+{
+    //posa = posicion de origen
+    //posb = posicion de destino
+    int t=a[posb];
+    a[posb]=a[posa];
+    a[posa]=t;
+}
+
+class clavebits
+{
+   private: int x;
+   public: 
+        clavebits& operator=(int i)
+        {
+            x=i; return *this;
+        }
+        inline unsigned bits (int k, int j)
+	{
+            return (x>>k)&~(~0<<j);
+	}
+};
+typedef clavebits tipoElemento;
+
+void cambioresiduos(int * a, int izq, int der, int b)
+{
+    int i,j; tipoElemento t;
+    if (der>izq && b>0)
+    {
+        i= izq;
+        j=der;
+        while(j!=i)
+        {
+            while(!a[i].bits(b,1) && i<j)i++;
+            while( a[j].bits(b,1) && j>i)j--;
+            intercambio(a, i, j);
+        }
+        if (!a[i].bits(b,1)) j++;
+        cambioresiduos(a, izq, j-1, b-1);
+        cambioresiduos(a, j, der, b-1);
+    }
+}
+
+int main(int argc, char **argv)
+{
+    
+    return 0;
+}
+
